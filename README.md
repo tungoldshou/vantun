@@ -1,10 +1,9 @@
 # VANTUN - Next-Generation Secure Tunnel Protocol
 
-[![License](https://img.shields.io/github/license/tungoldshou/vantun)](LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Release](https://img.shields.io/github/v/release/tungoldshou/vantun)](https://github.com/tungoldshou/vantun/releases)
-[![Discussions](https://img.shields.io/github/discussions/tungoldshou/vantun)](https://github.com/tungoldshou/vantun/discussions)
+[![Telegram](https://img.shields.io/badge/telegram-vantun01-blue?logo=telegram)](https://t.me/vantun01)
 [![Go Version](https://img.shields.io/badge/go-1.22-blue)](https://golang.org/)
-[![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey)](https://github.com/tungoldshou/vantun)
 
 ## Documentation Index
 
