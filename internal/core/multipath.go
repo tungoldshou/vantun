@@ -174,11 +174,22 @@ func (ms *MultipathSession) AddPath(ctx context.Context, addr string) error {
 	ms.mutex.Lock()
 	defer ms.mutex.Unlock()
 
+	Info("Adding path to %s", addr)
 	// Establish a new QUIC connection for the path
 	conn, err := quic.DialAddr(ctx, addr, ms.config.TLSConfig, nil)
 	if err != nil {
+		Error("Failed to dial path %s: %v", addr, err)
 		return fmt.Errorf("failed to dial path %s: %w", addr, err)
 	}
+	Info("Successfully dialed path %s", addr)
+
+	// Perform session negotiation handshake on the control stream.
+	if err := performClientHandshake(ctx, conn); err != nil {
+		conn.CloseWithError(0, "handshake failed")
+		Error("Handshake failed for path %s: %v", addr, err)
+		return fmt.Errorf("handshake failed for path %s: %w", addr, err)
+	}
+	Info("Session handshake completed for path %s", addr)
 
 	// Create a new path with initial placeholder values
 	path := &Path{
@@ -276,14 +287,17 @@ func (ms *MultipathSession) OpenStream(ctx context.Context) (quic.Stream, error)
 		return nil, fmt.Errorf("no active paths available")
 	}
 
+	Info("Opening stream on path %s", path.addr)
 	// Stream type 1 is for interactive data.
 	stream, err := path.conn.OpenStreamSync(ctx)
 	if err != nil {
 		Info("Failed to open stream on path %s: %v", path.addr, err)
 		return nil, err
 	}
+	Info("Successfully opened stream on path %s", path.addr)
 	
 	// Send stream type identifier on the stream.
+	Info("Sending stream type message on path %s", path.addr)
 	payload := &StreamTypePayload{
 		Type: StreamTypeInteractive,
 	}
@@ -301,6 +315,7 @@ func (ms *MultipathSession) OpenStream(ctx context.Context) (quic.Stream, error)
 	
 	if err := WriteMessage(stream, msg); err != nil {
 		stream.Close()
+		Info("Failed to send stream type message on path %s: %v", path.addr, err)
 		return nil, fmt.Errorf("failed to send stream type: %w", err)
 	}
 	

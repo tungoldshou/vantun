@@ -304,9 +304,42 @@ func createTestServer() (string, *Session, error) {
 					// Handle each stream in a separate goroutine
 					go func(s quic.Stream) {
 						defer s.Close()
+						Info("Handling new stream %v", s)
+						
+						// First, read and handle the stream type message
+						Info("About to read stream type message")
+						msg, err := ReadMessage(s)
+						if err != nil {
+							Info("Failed to read stream type message: %v", err)
+							return
+						}
+						Info("Successfully read message: Type=%d, Data length=%d", msg.Type, len(msg.Data))
+						
+						// If it's a stream type message, just acknowledge it by echoing it back
+						if msg.Type == StreamType {
+							Info("Received stream type message, echoing it back")
+							// Echo the stream type message back
+							if err := WriteMessage(s, msg); err != nil {
+								Error("Failed to write stream type echo: %v", err)
+								return
+							}
+							Info("Successfully echoed stream type message")
+						} else {
+							// For non-stream type messages, write it back and continue
+							Info("Received non-stream type message, echoing data")
+							if _, err := s.Write(msg.Data); err != nil {
+								Error("Failed to write echo: %v", err)
+								return
+							}
+						}
+						
+						// Continue reading and echoing data
+						Info("Entering data echoing loop")
 						buf := make([]byte, 4096)
 						for {
+							Info("About to read data")
 							n, err := s.Read(buf)
+							Info("Read returned: n=%d, err=%v", n, err)
 							if err != nil {
 								Info("Read error: %v", err)
 								return

@@ -9,6 +9,10 @@ import (
 	"time"
 )
 
+func init() {
+	InitLogger("debug")
+}
+
 // NetworkCondition represents network conditions for testing
 type NetworkCondition struct {
 	Latency   time.Duration
@@ -360,10 +364,12 @@ func testMultipathNetworkCondition(t *testing.T, condition NetworkCondition) {
 	ctx, cancel := context.WithTimeout(context.Background(), testDuration+5*time.Second)
 	defer cancel()
 
+	t.Logf("Adding path to multipath session")
 	err = multipathSession.AddPath(ctx, serverAddr)
 	if err != nil {
 		t.Fatalf("Failed to add path to multipath session: %v", err)
 	}
+	t.Logf("Successfully added path to multipath session")
 	defer func() {
 		if multipathSession != nil {
 			multipathSession.Close()
@@ -403,11 +409,14 @@ requestLoop:
 			requestStart := time.Now()
 
 			// Open stream
+			t.Logf("Opening multipath stream")
 			stream, err := multipathSession.OpenStream(ctx)
 			if err != nil {
+				t.Logf("Failed to open multipath stream: %v", err)
 				atomic.AddInt64(&totalErrors, 1)
 				continue
 			}
+			t.Logf("Multipath stream opened successfully, stream: %v", stream)
 
 			// Generate test data
 			testData := make([]byte, dataSize)
@@ -416,28 +425,36 @@ requestLoop:
 			}
 
 			// Send data
+			t.Logf("Sending data on multipath stream")
 			// First read any data that might be available (like the stream type response)
 			readBuf := make([]byte, 4096)
 			n, readErr := stream.Read(readBuf)
 			if readErr == nil {
 				t.Logf("Read %d bytes before sending test data: %v", n, readBuf[:n])
+			} else {
+				t.Logf("Failed to read from stream before sending: %v", readErr)
 			}
 			
 			_, err = stream.Write(testData)
 			if err != nil {
+				t.Logf("Failed to write data: %v", err)
 				atomic.AddInt64(&totalErrors, 1)
 				stream.Close()
 				continue
 			}
+			t.Logf("Data sent successfully on multipath stream")
 
 			// Read echo
+			t.Logf("Reading echo on multipath stream")
 			buf := make([]byte, dataSize)
-			_, err = stream.Read(buf)
+			n, err = stream.Read(buf)
 			if err != nil {
+				t.Logf("Failed to read echo: %v", err)
 				atomic.AddInt64(&totalErrors, 1)
 				stream.Close()
 				continue
 			}
+			t.Logf("Echo read successfully, received %d bytes", n)
 
 			// Verify data
 			match := true
