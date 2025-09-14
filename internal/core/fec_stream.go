@@ -2,10 +2,19 @@ package core
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/quic-go/quic-go"
 )
+
+// headerPool is a pool of byte slices used for FEC stream headers to reduce memory allocations
+var headerPool = sync.Pool{
+	New: func() interface{} {
+		// Headers are fixed size of 8 bytes
+		return make([]byte, 8)
+	},
+}
 
 // FECStream wraps a quic.Stream to add FEC capabilities.
 type FECStream struct {
@@ -37,10 +46,13 @@ func (f *FECStream) Write(p []byte) (n int, err error) {
 		return 0, fmt.Errorf("failed to encode data: %w", err)
 	}
 	
+	// Ensure shards are returned to pool
+	defer f.fec.ReturnShards(shards)
+	
 	// Send each shard with a header indicating shard index and total count
 	for i, shard := range shards {
-		// Create header: [shard_index][total_shards][data_length][shard_data]
-		header := make([]byte, 8)
+		// Get header from pool
+		header := headerPool.Get().([]byte)
 		header[0] = byte(i)
 		header[1] = byte(f.k + f.m)
 		// Note: This is a simplified header format. In a real implementation,
@@ -48,11 +60,19 @@ func (f *FECStream) Write(p []byte) (n int, err error) {
 		
 		// Write header and shard data
 		if _, err := f.stream.Write(header); err != nil {
+			// Return header to pool before returning error
+			headerPool.Put(header)
 			return 0, fmt.Errorf("failed to write header: %w", err)
 		}
+		
 		if _, err := f.stream.Write(shard); err != nil {
+			// Return header to pool before returning error
+			headerPool.Put(header)
 			return 0, fmt.Errorf("failed to write shard: %w", err)
 		}
+		
+		// Return header to pool
+		headerPool.Put(header)
 	}
 	
 	return len(p), nil

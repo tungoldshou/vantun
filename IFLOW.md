@@ -18,6 +18,8 @@
 
 * `vantun-prd.md`: 项目需求文档，详细描述了项目目标、功能模块、里程碑和技术栈建议。
 * `IFLOW.md`: 此文件，为 iFlow 提供项目上下文。
+* `README.md`: 项目主说明文档，包含项目概述、快速开始指南等。
+* `DEMOGUIDE.md`: 详细的使用示例和操作指南。
 
 根据 `vantun-prd.md`，项目的技术栈建议如下：
 
@@ -33,12 +35,27 @@
 
 ### 构建与运行
 
-目前项目尚未包含源代码和构建脚本。根据 PRD，最终将提供以下 CLI 程序：
+项目已包含源代码和构建脚本。可以通过以下命令构建：
 
-* **客户端**: `vantun client -c config.json`
-* **服务端**: `vantun server -c config.json`
+```bash
+go build -o bin/vantun cmd/main.go
+```
 
-配置文件 `config.json` 将支持端口、认证 token、FEC 策略、混淆策略等设置。
+构建后将提供以下 CLI 程序：
+
+* **客户端**: `./bin/vantun` (默认以客户端模式运行)
+* **服务端**: `./bin/vantun -server`
+
+可以通过命令行参数或配置文件来配置 VANTUN：
+
+* `-server`: 运行服务端模式
+* `-addr`: 监听地址（服务端）或连接地址（客户端）
+* `-config`: JSON 配置文件路径
+* `-log-level`: 日志级别（debug, info, warn, error）
+* `-multipath`: 启用多路径
+* `-obfs`: 启用混淆
+* `-fec-data`: FEC 数据分片数
+* `-fec-parity`: FEC 奇偶分片数
 
 ### 开发约定
 

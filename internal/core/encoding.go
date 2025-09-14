@@ -4,9 +4,18 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
+	"sync"
 
 	"github.com/fxamacker/cbor/v2"
 )
+
+// lengthBufPool is a pool of byte slices used for length prefixes to reduce memory allocations
+var lengthBufPool = sync.Pool{
+	New: func() interface{} {
+		// Length buffers are fixed size of 4 bytes
+		return make([]byte, 4)
+	},
+}
 
 // EncodeSessionInit encodes a SessionInitPayload into a CBOR byte slice.
 func EncodeSessionInit(payload *SessionInitPayload) ([]byte, error) {
@@ -69,9 +78,12 @@ func WriteMessage(stream io.Writer, msg *Message) error {
 		return fmt.Errorf("failed to marshal message: %w", err)
 	}
 	
+	// Get length buffer from pool
+	lengthBuf := lengthBufPool.Get().([]byte)
+	defer lengthBufPool.Put(lengthBuf)
+	
 	// Write length prefix (4 bytes, big endian)
 	length := uint32(len(data))
-	lengthBuf := make([]byte, 4)
 	binary.BigEndian.PutUint32(lengthBuf, length)
 	
 	if _, err := stream.Write(lengthBuf); err != nil {
@@ -88,8 +100,11 @@ func WriteMessage(stream io.Writer, msg *Message) error {
 
 // ReadMessage reads a message with a length prefix
 func ReadMessage(stream io.Reader) (*Message, error) {
+	// Get length buffer from pool
+	lengthBuf := lengthBufPool.Get().([]byte)
+	defer lengthBufPool.Put(lengthBuf)
+	
 	// Read length prefix (4 bytes)
-	lengthBuf := make([]byte, 4)
 	if _, err := io.ReadFull(stream, lengthBuf); err != nil {
 		return nil, fmt.Errorf("failed to read message length: %w", err)
 	}

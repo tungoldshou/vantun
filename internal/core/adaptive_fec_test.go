@@ -16,10 +16,11 @@ func TestAdaptiveFECAdjust(t *testing.T) {
 
 	// Test with high loss data (should increase parity shards)
 	highLossData := &TelemetryData{
-		RTT:       50 * time.Millisecond,
-		Loss:      0.15, // 15% loss
-		Bandwidth: 1000000,
-		Timestamp: time.Now(),
+		RTT:          50 * time.Millisecond,
+		Loss:         0.15, // 15% loss
+		Bandwidth:    1000000,
+		DeliveryRate: 1000000, // Match bandwidth for 100% efficiency
+		Timestamp:    time.Now(),
 	}
 
 	previousM := adaptiveFEC.m
@@ -38,10 +39,11 @@ func TestAdaptiveFECAdjust(t *testing.T) {
 
 	// Test with low loss data (should decrease parity shards)
 	lowLossData := &TelemetryData{
-		RTT:       50 * time.Millisecond,
-		Loss:      0.005, // 0.5% loss
-		Bandwidth: 1000000,
-		Timestamp: time.Now(),
+		RTT:          50 * time.Millisecond,
+		Loss:         0.005, // 0.5% loss
+		Bandwidth:    1000000,
+		DeliveryRate: 1000000, // Match bandwidth for 100% efficiency
+		Timestamp:    time.Now(),
 	}
 
 	err = adaptiveFEC.Adjust(lowLossData)
@@ -66,10 +68,11 @@ func TestAdaptiveFECBounds(t *testing.T) {
 
 	// Test with very high loss that would exceed maxParity
 	veryHighLossData := &TelemetryData{
-		RTT:       50 * time.Millisecond,
-		Loss:      0.5, // 50% loss
-		Bandwidth: 1000000,
-		Timestamp: time.Now(),
+		RTT:          50 * time.Millisecond,
+		Loss:         0.5, // 50% loss
+		Bandwidth:    1000000,
+		DeliveryRate: 1000000, // Match bandwidth for 100% efficiency
+		Timestamp:    time.Now(),
 	}
 
 	// Apply adjustment multiple times to try to exceed bounds
@@ -87,10 +90,11 @@ func TestAdaptiveFECBounds(t *testing.T) {
 
 	// Test with very low loss that would go below minParity
 	veryLowLossData := &TelemetryData{
-		RTT:       50 * time.Millisecond,
-		Loss:      0.001, // 0.1% loss
-		Bandwidth: 1000000,
-		Timestamp: time.Now(),
+		RTT:          50 * time.Millisecond,
+		Loss:         0.001, // 0.1% loss
+		Bandwidth:    1000000,
+		DeliveryRate: 1000000, // Match bandwidth for 100% efficiency
+		Timestamp:    time.Now(),
 	}
 
 	// Apply adjustment multiple times to try to go below bounds
@@ -145,10 +149,11 @@ func TestAdaptiveFECEncodeDecode(t *testing.T) {
 
 	// Adjust FEC parameters
 	highLossData := &TelemetryData{
-		RTT:       50 * time.Millisecond,
-		Loss:      0.2, // 20% loss
-		Bandwidth: 1000000,
-		Timestamp: time.Now(),
+		RTT:          50 * time.Millisecond,
+		Loss:         0.2, // 20% loss
+		Bandwidth:    1000000,
+		DeliveryRate: 1000000, // Match bandwidth for 100% efficiency
+		Timestamp:    time.Now(),
 	}
 
 	err = adaptiveFEC.Adjust(highLossData)

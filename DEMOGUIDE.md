@@ -5,8 +5,8 @@
 确保你已经安装了 Go 1.21 或更高版本。
 
 ```bash
-# 克隆仓库
-git clone <repository-url>
+# 克隆仓库 (如果尚未克隆)
+# git clone <repository-url>
 cd vantun
 
 # 编译
@@ -45,6 +45,8 @@ VANTUN 支持通过命令行参数和 JSON 配置文件进行配置。
   "token_bucket_capacity": 5000000
 }
 ```
+
+你也可以参考 `test_configs/` 目录下的示例配置文件。
 
 ## 3. 运行
 
@@ -94,13 +96,19 @@ VANTUN 支持通过命令行参数和 JSON 配置文件进行配置。
 
 修改 `config.json` 中的 `fec_data` 和 `fec_parity` 参数，然后重新启动客户端和服务端。
 
+你也可以使用 `test_configs/` 目录下的 `fec_client.json` 和 `fec_server.json` 示例配置文件。
+
 ### 5.2 测试流量混淆
 
 在客户端和服务端都启用 `-obfs` 参数或在配置文件中设置 `"obfs": true`。
 
+你也可以使用 `test_configs/` 目录下的 `obfs_client.json` 和 `obfs_server.json` 示例配置文件。
+
 ### 5.3 测试多路径
 
 多路径功能需要多个网络接口。你可以使用 Linux 的 `netem` 工具来模拟不同的网络条件。
+
+你也可以使用 `test_configs/` 目录下的 `multipath_client.json` 和 `multipath_server.json` 示例配置文件。
 
 ## 6. 性能测试
 
