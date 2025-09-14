@@ -13,6 +13,7 @@ For detailed documentation, please refer to the following files:
 - [Demo Guide](docs/DEMOGUIDE_en.md) - Step-by-step instructions for building, configuring, and running
 - [Change Log](docs/CHANGELOG_en.md) - Project development history and version changes
 - [Contribution Guidelines](docs/CONTRIBUTING_en.md) - How to contribute to the project
+- [Discussions Guide](docs/DISCUSSIONS_GUIDE.md) - Community discussions and guidelines
 
 ## Project Overview
 
