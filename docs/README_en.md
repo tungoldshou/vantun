@@ -1,16 +1,5 @@
 # VANTUN - Next-Generation Secure Tunnel Protocol
 
-## Documentation Index
-
-For detailed documentation, please refer to the following files:
-
-- [README](docs/README_en.md) - Project overview and key features
-- [Demo Guide](docs/DEMOGUIDE_en.md) - Step-by-step instructions for building, configuring, and running
-- [Change Log](docs/CHANGELOG_en.md) - Project development history and version changes
-- [Contribution Guidelines](docs/CONTRIBUTING_en.md) - How to contribute to the project
-
-## Project Overview
-
 VANTUN is a cutting-edge, high-performance tunnel protocol built on top of QUIC, designed to deliver exceptional network performance, security, and reliability. As a next-generation solution, VANTUN redefines what's possible in network tunneling with its innovative architecture and advanced features.
 
 ## Key Advantages
@@ -51,7 +40,7 @@ Get VANTUN up and running in just a few minutes:
 3. **Configure**: Create `config.json` configuration file
 4. **Run**: Start server and client
 
-For detailed steps and configuration instructions, please refer to [Demo Guide](docs/DEMOGUIDE_en.md).
+For detailed steps and configuration instructions, please refer to [Demo Guide](DEMOGUIDE_en.md).
 
 ## Project Structure
 
@@ -61,7 +50,6 @@ vantun/
 ├── internal/
 │   ├── cli/          # CLI configuration management
 │   └── core/         # Core protocol implementation
-├── docs/             # Documentation
 ├── go.mod            # Go module definition
 └── README.md         # Project documentation
 ```
