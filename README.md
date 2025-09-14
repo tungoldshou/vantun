@@ -4,6 +4,7 @@
 [![Release](https://img.shields.io/github/v/release/tungoldshou/vantun)](https://github.com/tungoldshou/vantun/releases)
 [![Telegram](https://img.shields.io/badge/telegram-vantun01-blue?logo=telegram)](https://t.me/vantun01)
 [![Go Version](https://img.shields.io/badge/go-1.22-blue)](https://golang.org/)
+[![Star History](https://img.shields.io/badge/star_history-coming_soon-orange)](docs/STAR_HISTORY.md)
 
 ## Documentation Index
 
