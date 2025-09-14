@@ -1,0 +1,11 @@
+{
+  "server": false,
+  "address": "localhost:4242",
+  "log_level": "info",
+  "multipath": false,
+  "obfs": true,
+  "fec_data": 10,
+  "fec_parity": 3,
+  "token_bucket_rate": 1000000,
+  "token_bucket_capacity": 5000000
+}
