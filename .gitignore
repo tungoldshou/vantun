@@ -1,0 +1,17 @@
+# Binaries
+bin/
+
+# Log files
+*.log
+
+# IDE files
+*.swp
+*.swo
+.DS_Store
+
+# Environment files
+.env
+.env.local
+
+# Test coverage
+coverage/
