@@ -15,3 +15,7 @@ bin/
 
 # Test coverage
 coverage/
+
+# doc
+IFLOW.md
+VANTUN_Complete_Documentation.md
