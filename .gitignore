@@ -1,21 +1,208 @@
-# Binaries
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
 bin/
+vantun
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Go workspace file
+go.work
+
+# Dependency directories
+vendor/
+
+# Build directories
+dist/
+build/
+release/
 
 # Log files
 *.log
+logs/
+/var/log/
 
 # IDE files
 *.swp
 *.swo
 .DS_Store
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
 
 # Environment files
 .env
 .env.local
+.env.*.local
 
 # Test coverage
 coverage/
+*.coverprofile
+*.coverage
 
-# doc
-IFLOW.md
-VANTUN_Complete_Documentation.md
+# Local development files
+local/
+tmp/
+temp/
+.tmp/
+*.tmp
+
+# Documentation build files
+docs/.vitepress/dist/
+docs/.vitepress/cache/
+
+# Wiki build files (if generated locally)
+wiki/*.html
+wiki/_site/
+
+# Benchmark results
+benchmark-results/
+*.benchmark
+performance-data/
+
+# Docker local files
+.docker/
+docker-compose.override.yml
+
+# Node.js (if any frontend tooling)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Python (for scripts)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+
+# Ruby (for Jekyll if used)
+.ruby-version
+.ruby-gemset
+.bundle/
+vendor/bundle/
+
+# Local configuration files
+config.local.json
+server.local.json
+client.local.json
+*.local
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Backup files
+*.bak
+*.backup
+*.old
+*.orig
+
+# IDE specific files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# GitHub Actions local files
+.github/workflows/*.yml.local
+
+# Coverage and test files
+coverage/
+*.coverprofile
+*.coverage
+*.cov
+
+# Profiling files
+*.prof
+*.pprof
+cpu.prof
+mem.prof
+
+# Local development certificates
+*.pem
+*.key
+*.crt
+*.csr
+localhost.*
+
+# Temporary files
+*.tmp
+*.temp
+*~
+.#*
+
+# Project specific
+# Keep only essential files
+docs/*.html  # Generated HTML files (keep markdown source)
+scripts/*.log  # Script logs
+*.benchmark  # Benchmark output
+performance-data/  # Performance test results
+
+# Keep these documentation files
+# docs/index.html (keep - main documentation page)
+# docs/README.md (keep - documentation index)
+# README_DETAILED.md (keep - main documentation)
+
+# Local development
+.local/
+dev/
+test/
+testing/
+
+# CI/CD local files
+.ci/
+.github/actions/*/node_modules/
+
+# Binary outputs (keep source code only)
+bin/
+dist/
+release/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Profiling and debugging
+debug/
+profile/
+*.debug
+*.profile
+
+# Environment and secrets
+.secrets/
+*.secret
+config/secrets.json
+
+# Documentation build outputs (keep source)
+docs/_build/
+docs/_site/
+docs/.cache/
+
+# Keep these but ignore generated content
+!docs/index.html
+!docs/README.md
+!docs/wiki/index.html
