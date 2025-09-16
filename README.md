@@ -4,17 +4,34 @@
 [![Release](https://img.shields.io/github/v/release/tungoldshou/vantun)](https://github.com/tungoldshou/vantun/releases)
 [![Telegram](https://img.shields.io/badge/telegram-vantun01-blue?logo=telegram)](https://t.me/vantun01)
 [![Go Version](https://img.shields.io/badge/go-1.22-blue)](https://golang.org/)
-[![Star History](https://img.shields.io/badge/star_history-coming_soon-orange)](docs/STAR_HISTORY.md)
+
+![Networking](https://img.shields.io/badge/tag-networking-blue)
+![QUIC](https://img.shields.io/badge/tag-quic-green)
+![Proxy Protocol](https://img.shields.io/badge/tag-proxy--protocol-orange)
+![VPN](https://img.shields.io/badge/tag-vpn-purple)
+![Privacy](https://img.shields.io/badge/tag-privacy-red)
+
+## 🌟 Core Highlights
+
+- **30% more stable than Hysteria2 in high packet loss environments** - Advanced FEC technology maintains connection stability even with 15% packet loss
+- **HTTP/3 traffic camouflage** - Traffic appears as regular web browsing, blending seamlessly with normal internet activity
+- **Multipath transmission** - Automatically utilizes multiple network paths for enhanced reliability and performance
+- **Enterprise-grade security** - Built on QUIC protocol with additional encryption layers for maximum privacy protection
 
 ## Documentation Index
 
 For detailed documentation, please refer to the following files:
 
-- [README](docs/README_en.md) - Project overview and key features
-- [Demo Guide](docs/DEMOGUIDE_en.md) - Step-by-step instructions for building, configuring, and running
-- [Change Log](docs/CHANGELOG_en.md) - Project development history and version changes
-- [Contribution Guidelines](docs/CONTRIBUTING_en.md) - How to contribute to the project
-- [Discussions Guide](docs/DISCUSSIONS_GUIDE.md) - Community discussions and guidelines
+- [English](docs/README_en.md)
+- [中文](docs/README_zh.md)
+- [日本語](docs/README_ja.md)
+- [Français](docs/README_fr.md)
+- [Deutsch](docs/README_de.md)
+- [Español](docs/README_es.md)
+- [Русский](docs/README_ru.md)
+- [Português](docs/README_pt.md)
+- [한국어](docs/README_ko.md)
+- [العربية](docs/README_ar.md)
 
 ## Project Overview
 
