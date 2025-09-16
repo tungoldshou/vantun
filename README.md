@@ -22,16 +22,22 @@
 
 For detailed documentation, please refer to the following files:
 
-- [English](docs/README_en.md)
-- [中文](docs/README_zh.md)
-- [日本語](docs/README_ja.md)
-- [Français](docs/README_fr.md)
-- [Deutsch](docs/README_de.md)
-- [Español](docs/README_es.md)
-- [Русский](docs/README_ru.md)
-- [Português](docs/README_pt.md)
-- [한국어](docs/README_ko.md)
-- [العربية](docs/README_ar.md)
+<table align="center">
+  <tr>
+    <td align="center"><a href="docs/README_en.md">English</a></td>
+    <td align="center"><a href="docs/README_zh.md">中文</a></td>
+    <td align="center"><a href="docs/README_ja.md">日本語</a></td>
+    <td align="center"><a href="docs/README_fr.md">Français</a></td>
+    <td align="center"><a href="docs/README_de.md">Deutsch</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="docs/README_es.md">Español</a></td>
+    <td align="center"><a href="docs/README_ru.md">Русский</a></td>
+    <td align="center"><a href="docs/README_pt.md">Português</a></td>
+    <td align="center"><a href="docs/README_ko.md">한국어</a></td>
+    <td align="center"><a href="docs/README_ar.md">العربية</a></td>
+  </tr>
+</table>
 
 ## Project Overview
 
