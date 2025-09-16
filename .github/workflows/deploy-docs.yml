@@ -58,14 +58,14 @@ jobs:
                 filename=$(basename "$md_file" .md)
                 echo "Processing: $md_file -> wiki/${filename}.html"
                 
-                # Create HTML wrapper
-                cat > "docs/wiki/${filename}.html" << EOF
+                # Create HTML wrapper for better web presentation
+                cat > "docs/wiki/${filename}.html" << 'HTML_EOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VANTUN Wiki - ${filename}</title>
+    <title>VANTUN Wiki - Documentation</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; 
                line-height: 1.6; max-width: 900px; margin: 0 auto; padding: 2rem; color: #24292e; 
@@ -98,7 +98,7 @@ jobs:
 <body>
     <div class="header">
         <h1>🚀 VANTUN Wiki</h1>
-        <p>${filename}</p>
+        <p>Documentation Page</p>
     </div>
     
     <div class="nav">
@@ -110,7 +110,7 @@ jobs:
     </div>
     
     <div class="content">
-EOF
+HTML_EOF
                 
                 # Convert markdown to HTML
                 if command -v pandoc >/dev/null 2>&1; then
