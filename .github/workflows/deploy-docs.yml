@@ -5,8 +5,9 @@ on:
     branches: [ main ]
     paths:
       - 'docs/**'
-      - '.github/workflows/deploy-docs.yml'
       - 'wiki/**'
+      - '.github/workflows/deploy-docs.yml'
+      - 'README_DETAILED.md'
 
 permissions:
   contents: read
@@ -27,215 +28,258 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
         
-      - name: Copy Wiki content to docs
+      - name: Install tools
         run: |
-          # Copy Wiki content to docs folder for deployment
-          echo "📚 Copying Wiki content to docs directory..."
-          cp -r wiki/* docs/ 2>/dev/null || echo "No Wiki files found, skipping copy"
+          sudo apt-get update
+          sudo apt-get install -y pandoc || true
           
-          # Convert Wiki markdown files to HTML for better presentation
-          echo "🔄 Converting Wiki markdown to HTML format..."
-          for md_file in docs/*.md; do
-            if [ -f "$md_file" ]; then
-              filename=$(basename "$md_file" .md)
-              echo "Processing: $md_file -> $filename.html"
-              
-              # Create a simple HTML wrapper for markdown files
-              cat > "docs/${filename}.html" << HTML_EOF
+      - name: Process documentation
+        run: |
+          echo "📚 Processing documentation for GitHub Pages..."
+          
+          # Ensure docs directory exists
+          mkdir -p docs
+          
+          # Copy main documentation files
+          echo "📄 Copying main documentation files..."
+          cp README_DETAILED.md docs/ || true
+          cp docs/*.md docs/ 2>/dev/null || true
+          
+          # Process Wiki files if they exist
+          if [ -d "wiki" ]; then
+            echo "📖 Processing Wiki content..."
+            mkdir -p docs/wiki
+            cp -r wiki/* docs/wiki/ 2>/dev/null || true
+            
+            # Convert Wiki markdown to HTML for better web presentation
+            echo "🔄 Converting Wiki markdown to HTML..."
+            for md_file in docs/wiki/*.md; do
+              if [ -f "$md_file" ]; then
+                filename=$(basename "$md_file" .md)
+                echo "Processing: $md_file -> wiki/${filename}.html"
+                
+                # Create HTML wrapper
+                cat > "docs/wiki/${filename}.html" << EOF
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VANTUN - $(echo $filename | tr '-' ' ' | sed 's/.*/\L&/; s/[a-z]*/\u&/g')</title>
+    <title>VANTUN Wiki - ${filename}</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; 
-               line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 2rem; color: #24292e; }
-        h1, h2, h3 { color: #24292e; }
-        code { background: #f6f8fa; padding: 0.2rem 0.4rem; border-radius: 3px; font-family: monospace; }
-        pre { background: #f6f8fa; padding: 1rem; border-radius: 6px; overflow-x: auto; }
-        .header { background: linear-gradient(135deg, #2ea44f 0%, #1a7f37 100%); color: white; padding: 2rem; 
-                  text-align: center; margin-bottom: 2rem; border-radius: 8px; }
-        .nav { margin-bottom: 2rem; }
-        .nav a { color: #0969da; text-decoration: none; margin-right: 1rem; }
+               line-height: 1.6; max-width: 900px; margin: 0 auto; padding: 2rem; color: #24292e; 
+               background: #ffffff; }
+        .header { background: linear-gradient(135deg, #2ea44f 0%, #1a7f37 100%); color: white; 
+                  padding: 2rem; text-align: center; margin-bottom: 2rem; border-radius: 8px; }
+        .nav { background: #f6f8fa; padding: 1rem; margin-bottom: 2rem; border-radius: 6px; }
+        .nav a { color: #0969da; text-decoration: none; margin-right: 1rem; font-weight: 500; }
         .nav a:hover { text-decoration: underline; }
+        h1, h2, h3 { color: #24292e; margin-top: 1.5rem; margin-bottom: 1rem; }
+        h1 { border-bottom: 2px solid #e1e4e8; padding-bottom: 0.5rem; }
+        h2 { border-bottom: 1px solid #e1e4e8; padding-bottom: 0.3rem; }
+        code { background: #f6f8fa; padding: 0.2rem 0.4rem; border-radius: 3px; font-family: 'SFMono-Regular', Consolas, monospace; font-size: 0.9em; }
+        pre { background: #f6f8fa; padding: 1rem; border-radius: 6px; overflow-x: auto; border-left: 4px solid #2ea44f; }
+        pre code { background: none; padding: 0; }
+        table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+        th, td { border: 1px solid #e1e4e8; padding: 0.75rem; text-align: left; }
+        th { background: #f6f8fa; font-weight: 600; }
+        .highlight { background: #fff5b4; padding: 1rem; border-left: 4px solid #f66a0a; border-radius: 6px; margin: 1rem 0; }
+        .note { background: #ddf4ff; padding: 1rem; border-left: 4px solid #0969da; border-radius: 6px; margin: 1rem 0; }
+        .warning { background: #ffebe9; padding: 1rem; border-left: 4px solid #d1242f; border-radius: 6px; margin: 1rem 0; }
+        .toc { background: #f6f8fa; padding: 1rem; border-radius: 6px; margin-bottom: 2rem; }
+        .toc ul { list-style: none; padding-left: 0; }
+        .toc li { margin-bottom: 0.5rem; }
+        .toc a { color: #0969da; text-decoration: none; }
+        .toc a:hover { text-decoration: underline; }
+        .footer { text-align: center; margin-top: 3rem; padding: 2rem; background: #f6f8fa; border-radius: 8px; color: #586069; }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>🚀 VANTUN Documentation</h1>
-        <p>$(echo $filename | tr '-' ' ' | sed 's/.*/\L&/; s/[a-z]*/\u&/g')</p>
+        <h1>🚀 VANTUN Wiki</h1>
+        <p>${filename}</p>
     </div>
     
     <div class="nav">
-        <a href="index.html">🏠 Home</a>
-        <a href="README.md">📖 Documentation</a>
+        <a href="../index.html">🏠 Home</a>
+        <a href="../README.md">📖 Documentation</a>
+        <a href="Home.html">📚 Wiki Home</a>
         <a href="https://github.com/tungoldshou/vantun">💻 GitHub</a>
         <a href="https://t.me/vantun01">💬 Telegram</a>
     </div>
     
     <div class="content">
-HTML_EOF
-              
-              # Convert markdown to HTML (simple conversion)
-              if command -v pandoc >/dev/null 2>&1; then
-                pandoc "$md_file" -t html >> "docs/${filename}.html"
-              else
-                # Fallback: simple markdown to HTML conversion
-                sed 's/^# /# /; s/^## /## /; s/^### /### /; 
-                     s/`\([^`]*\)`/<code>\1<\/code>/g; 
-                     s/\[\([^]]*\)\]\(([^)]*)\)/<a href="\2">\1<\/a>/g;' "$md_file" >> "docs/${filename}.html"
+EOF
+                
+                # Convert markdown to HTML
+                if command -v pandoc >/dev/null 2>&1; then
+                  pandoc "$md_file" --from markdown --to html >> "docs/wiki/${filename}.html"
+                else
+                  # Simple markdown to HTML conversion
+                  sed -e 's/^# /# /' \
+                      -e 's/^## /## /' \
+                      -e 's/^### /### /' \
+                      -e 's/\*\*\([^*]*\)\*\*/<strong>\1<\/strong>/g' \
+                      -e 's/\*\([^*]*\)\*/<em>\1<\/em>/g' \
+                      -e 's/`\([^`]*\)`/<code>\1<\/code>/g' \
+                      "$md_file" >> "docs/wiki/${filename}.html"
+                fi
+                
+                echo "    </div>" >> "docs/wiki/${filename}.html"
+                echo "</body>" >> "docs/wiki/${filename}.html"
+                echo "</html>" >> "docs/wiki/${filename}.html"
+                
+                echo "✅ Created: docs/wiki/${filename}.html"
               fi
-              
-              echo "    </div>" >> "docs/${filename}.html"
-              echo "</body>" >> "docs/${filename}.html"
-              echo "</html>" >> "docs/${filename}.html"
-            fi
-          done
+            done
+          fi
           
-          # Create a comprehensive index page
-          echo "📝 Creating comprehensive documentation index..."
-          cat > docs/README.md << 'EOF'
-# VANTUN Documentation
-
-Welcome to the VANTUN documentation! This site contains comprehensive guides and technical documentation for the next-generation secure tunnel protocol.
-
-## 🚀 Quick Navigation
-
-### 📚 Main Documentation
-- **[🏠 Home](index.html)** - Interactive documentation homepage
-- **[📖 Detailed README](https://github.com/tungoldshou/vantun/blob/main/README_DETAILED.md)** - Complete project overview with benchmarks
-- **[🐳 Docker Deployment](DOCKER_DEPLOYMENT.md)** - Container deployment strategies
-- **[🔬 Technical Deep Dive](TECHNICAL_DEEP_DIVE.md)** - Architecture and implementation details
-
-### 🛠️ Installation & Deployment
-- **One-Click Script**: `curl -fsSL https://get.vantun.org | bash`
-- **Docker**: `docker run -d --name vantun-server -p 4242:4242 tungoldshou/vantun:latest server`
-- **Manual**: Download from [GitHub Releases](https://github.com/tungoldshou/vantun/releases)
-
-### 📊 Performance & Benchmarking
-- **Benchmark Script**: `./scripts/benchmark.sh`
-- **Interactive Charts**: Generated performance visualizations
-- **Protocol Comparison**: Detailed analysis vs Hysteria2, V2Ray, WireGuard
-
-## 📈 Performance Highlights
-
-### Throughput Comparison (100Mbps baseline)
-```
-Network Condition | VANTUN | Hysteria2 | V2Ray | WireGuard
-------------------|--------|-----------|-------|----------
-0% Loss           |   98   |    94     |  89   |    85
-5% Loss           |   95   |    76     |  62   |    48
-10% Loss          |   89   |    58     |  44   |    36
-15% Loss          |   82   |    41     |  31   |    25
-20% Loss          |   58   |    18     |  15   |    12
-```
-
-## 🚀 Quick Start
-
-### Option 1: One-Click Script (Recommended)
-```bash
-curl -fsSL https://get.vantun.org | bash
-```
-
-### Option 2: Docker
-```bash
-# Server
-docker run -d --name vantun-server -p 4242:4242 tungoldshou/vantun:latest server
-
-# Client
-docker run -d --name vantun-client -p 1080:1080 tungoldshou/vantun:latest client
-```
-
-### Option 3: Docker Compose
-```bash
-docker-compose up -d
-```
-
-## 📚 Documentation Structure
-
-```
-vantun/
-├── README_DETAILED.md          # Complete project documentation
-├── docs/                       # GitHub Pages documentation
-│   ├── index.html             # Interactive documentation site
-│   ├── DOCKER_DEPLOYMENT.md   # Docker deployment guide
-│   ├── TECHNICAL_DEEP_DIVE.md # Technical architecture details
-│   └── ...                    # Additional documentation
-├── wiki/                      # GitHub Wiki source files
-│   ├── Home.md                # Wiki homepage
-│   ├── Quick-Start.md         # Quick start guide
-│   ├── Protocol-Comparison.md # Performance comparisons
-│   ├── Technical-Deep-Dive.md # Architecture details
-│   ├── Benchmarking.md        # Testing and benchmarking
-│   └── ...                    # Additional Wiki pages
-├── scripts/                   # Utility scripts
-│   ├── install.sh            # One-click installation
-│   ├── benchmark.sh          # Performance benchmarking
-│   └── docker-entrypoint.sh  # Docker entry point
-└── WIKI_SETUP_GUIDE.md       # GitHub Wiki setup instructions
-```
-
-## 🔧 Configuration Example
-
-### Basic Server Configuration
-```json
-{
-  "server": true,
-  "address": "0.0.0.0:4242",
-  "log_level": "info",
-  "multipath": true,
-  "obfs": true,
-  "fec_data": 10,
-  "fec_parity": 3
-}
-```
-
-### Basic Client Configuration
-```json
-{
-  "server": false,
-  "address": "your-server.com:4242",
-  "log_level": "info",
-  "multipath": true,
-  "obfs": true,
-  "local_addr": "127.0.0.1:1080",
-  "socks5": true
-}
-```
-
-## 📊 Benchmarking
-
-Run comprehensive performance tests:
-```bash
-./scripts/benchmark.sh
-```
-
-This will generate:
-- Throughput comparison charts
-- Latency performance analysis
-- Connection stability metrics
-- Interactive HTML reports
-
-## 🌐 Community & Support
-
-- **💬 Telegram**: [@vantun01](https://t.me/vantun01)
-- **🐛 Issues**: [GitHub Issues](https://github.com/tungoldshou/vantun/issues)
-- **📧 Email**: support@vantun.org
-- **📖 Wiki**: [GitHub Wiki](https://github.com/tungoldshou/vantun/wiki)
-
-## 🔗 Quick Links
-
-- **[GitHub Repository](https://github.com/tungoldshou/vantun)** - Source code and releases
-- **[Interactive Documentation](index.html)** - Beautiful HTML documentation
-- **[Docker Hub](https://hub.docker.com/r/tungoldshou/vantun)** - Container images
-- **[Performance Charts](index.html#benchmarking)** - Interactive performance visualizations
-
----
-
-*This documentation is automatically deployed via GitHub Actions. For the latest updates, please check the [GitHub repository](https://github.com/tungoldshou/vantun).*
+          # Create Wiki index page
+          echo "📝 Creating Wiki index page..."
+          cat > docs/wiki/index.html << 'EOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VANTUN Wiki - Complete Documentation</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; 
+               line-height: 1.6; max-width: 1200px; margin: 0 auto; padding: 2rem; color: #24292e; 
+               background: #ffffff; }
+        .header { background: linear-gradient(135deg, #2ea44f 0%, #1a7f37 100%); color: white; 
+                  padding: 2rem; text-align: center; margin-bottom: 2rem; border-radius: 8px; }
+        .nav { background: #f6f8fa; padding: 1rem; margin-bottom: 2rem; border-radius: 6px; }
+        .nav a { color: #0969da; text-decoration: none; margin-right: 1rem; font-weight: 500; }
+        .nav a:hover { text-decoration: underline; }
+        .content { display: grid; grid-template-columns: 250px 1fr; gap: 2rem; }
+        .sidebar { background: #f6f8fa; padding: 1.5rem; border-radius: 8px; height: fit-content; }
+        .sidebar h3 { color: #24292e; margin-bottom: 1rem; }
+        .sidebar ul { list-style: none; padding: 0; }
+        .sidebar li { margin-bottom: 0.5rem; }
+        .sidebar a { text-decoration: none; color: #586069; font-size: 0.9rem; }
+        .sidebar a:hover { color: #2ea44f; }
+        .main-content { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        h1, h2, h3 { color: #24292e; }
+        h1 { font-size: 2rem; border-bottom: 2px solid #e1e4e8; padding-bottom: 0.5rem; }
+        h2 { font-size: 1.5rem; margin-top: 2rem; }
+        .highlight { background: #fff5b4; padding: 1rem; border-left: 4px solid #f66a0a; border-radius: 6px; margin: 1rem 0; }
+        .note { background: #ddf4ff; padding: 1rem; border-left: 4px solid #0969da; border-radius: 6px; margin: 1rem 0; }
+        .card { background: #f6f8fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid #2ea44f; }
+        .footer { text-align: center; margin-top: 3rem; padding: 2rem; background: #f6f8fa; border-radius: 8px; color: #586069; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📚 VANTUN Wiki</h1>
+        <p>Complete documentation for the next-generation secure tunnel protocol</p>
+    </div>
+    
+    <div class="nav">
+        <a href="../index.html">🏠 Home</a>
+        <a href="../README.md">📖 Documentation</a>
+        <a href="Home.html">📚 Wiki Home</a>
+        <a href="https://github.com/tungoldshou/vantun">💻 GitHub</a>
+        <a href="https://t.me/vantun01">💬 Telegram</a>
+    </div>
+    
+    <div class="content">
+        <aside class="sidebar">
+            <h3>📖 Documentation</h3>
+            <ul>
+                <li><a href="Home.html">🏠 Home</a></li>
+                <li><a href="Quick-Start.html">⚡ Quick Start</a></li>
+                <li><a href="Installation-Guide.html">📋 Installation Guide</a></li>
+                <li><a href="Configuration.html">⚙️ Configuration</a></li>
+                <li><a href="Protocol-Comparison.html">⚖️ Protocol Comparison</a></li>
+                <li><a href="Technical-Deep-Dive.html">🔬 Technical Deep Dive</a></li>
+                <li><a href="Benchmarking.html">📊 Benchmarking</a></li>
+            </ul>
+            
+            <h3>🔗 Resources</h3>
+            <ul>
+                <li><a href="https://github.com/tungoldshou/vantun">GitHub Repository</a></li>
+                <li><a href="https://github.com/tungoldshou/vantun/releases">Releases</a></li>
+                <li><a href="https://github.com/tungoldshou/vantun/issues">Issue Tracker</a></li>
+                <li><a href="https://t.me/vantun01">Telegram Channel</a></li>
+            </ul>
+        </aside>
+        
+        <div class="main-content">
+            <h1>🏠 VANTUN Wiki Home</h1>
+            
+            <div class="highlight">
+                <strong>🎯 Key Advantages:</strong>
+                <ul>
+                    <li><strong>30% more stable</strong> than Hysteria2 in high packet loss environments</li>
+                    <li><strong>HTTP/3 traffic camouflage</strong> - Traffic appears as regular web browsing</li>
+                    <li><strong>Multipath transmission</strong> - Automatically utilizes multiple network paths</li>
+                    <li><strong>Enterprise-grade security</strong> - Built on QUIC with additional encryption layers</li>
+                </ul>
+            </div>
+            
+            <h2>🚀 Quick Navigation</h2>
+            <div class="note">
+                <h4>📚 Documentation Sections</h4>
+                <ul>
+                    <li><a href="Quick-Start.html">⚡ Quick Start Guide</a> - Get started in 5 minutes</li>
+                    <li><a href="Installation-Guide.html">📋 Installation Guide</a> - Detailed installation instructions</li>
+                    <li><a href="Configuration.html">⚙️ Configuration</a> - All configuration options explained</li>
+                    <li><a href="Protocol-Comparison.html">⚖️ Protocol Comparison</a> - VANTUN vs competitors</li>
+                    <li><a href="Technical-Deep-Dive.html">🔬 Technical Deep Dive</a> - Architecture and design</li>
+                    <li><a href="Benchmarking.html">📊 Benchmarking</a> - Performance testing guide</li>
+                </ul>
+            </div>
+            
+            <h2>📈 Performance Highlights</h2>
+            <div class="card">
+                <h4>Throughput Comparison (100Mbps baseline)</h4>
+                <table>
+                    <tr><th>Network Condition</th><th>VANTUN</th><th>Hysteria2</th><th>V2Ray</th><th>WireGuard</th></tr>
+                    <tr><td>0% Loss</td><td>98 Mbps</td><td>94 Mbps</td><td>89 Mbps</td><td>85 Mbps</td></tr>
+                    <tr><td>5% Loss</td><td>95 Mbps</td><td>76 Mbps</td><td>62 Mbps</td><td>48 Mbps</td></tr>
+                    <tr><td>10% Loss</td><td>89 Mbps</td><td>58 Mbps</td><td>44 Mbps</td><td>36 Mbps</td></tr>
+                    <tr><td>15% Loss</td><td>82 Mbps</td><td>41 Mbps</td><td>31 Mbps</td><td>25 Mbps</td></tr>
+                </table>
+            </div>
+            
+            <h2>🚀 Quick Start</h2>
+            <div class="card">
+                <h4>Option 1: One-Click Script (Recommended)</h4>
+                <pre><code>curl -fsSL https://get.vantun.org | bash</code></pre>
+            </div>
+            
+            <div class="card">
+                <h4>Option 2: Docker</h4>
+                <pre><code>docker run -d --name vantun-server -p 4242:4242 tungoldshou/vantun:latest server</code></pre>
+            </div>
+            
+            <h2>💬 Community & Support</h2>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <a href="https://t.me/vantun01" class="btn">💬 Telegram Channel</a>
+                <a href="https://github.com/tungoldshou/vantun/issues" class="btn btn-secondary">🐛 Issue Tracker</a>
+                <a href="mailto:support@vantun.org" class="btn btn-secondary">📧 Email Support</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>&copy; 2025 VANTUN Project. All rights reserved.</p>
+        <p>Documentation automatically deployed via GitHub Actions</p>
+    </div>
+</body>
+</html>
 EOF
           
+          echo "✅ Wiki index page created: docs/wiki/index.html"
+          
+          # List created files
+          echo "📋 Created documentation files:"
+          find docs -name "*.html" -o -name "*.md" | sort
+          
+          echo "🎉 Documentation processing completed!"
+        
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
@@ -251,3 +295,11 @@ EOF
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        
+      - name: Output deployment URL
+        run: |
+          echo "🎉 Documentation deployed successfully!"
+          echo "📚 Visit your documentation at: ${{ steps.deployment.outputs.pages_url }}"
+          echo "🔗 Main documentation: ${{ steps.deployment.outputs.pages_url }}"
+          echo "📖 Wiki documentation: ${{ steps.deployment.outputs.pages_url }}/wiki/"
+          echo "🏠 Interactive documentation: ${{ steps.deployment.outputs.pages_url }}/index.html"
