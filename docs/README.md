@@ -1,101 +1,3 @@
-name: Deploy Documentation to GitHub Pages
-
-on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'docs/**'
-      - '.github/workflows/deploy-docs.yml'
-      - 'wiki/**'
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-        
-      - name: Copy Wiki content to docs
-        run: |
-          # Copy Wiki content to docs folder for deployment
-          echo "📚 Copying Wiki content to docs directory..."
-          cp -r wiki/* docs/ 2>/dev/null || echo "No Wiki files found, skipping copy"
-          
-          # Convert Wiki markdown files to HTML for better presentation
-          echo "🔄 Converting Wiki markdown to HTML format..."
-          for md_file in docs/*.md; do
-            if [ -f "$md_file" ]; then
-              filename=$(basename "$md_file" .md)
-              echo "Processing: $md_file -> $filename.html"
-              
-              # Create a simple HTML wrapper for markdown files
-              cat > "docs/${filename}.html" << HTML_EOF
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VANTUN - $(echo $filename | tr '-' ' ' | sed 's/.*/\L&/; s/[a-z]*/\u&/g')</title>
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; 
-               line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 2rem; color: #24292e; }
-        h1, h2, h3 { color: #24292e; }
-        code { background: #f6f8fa; padding: 0.2rem 0.4rem; border-radius: 3px; font-family: monospace; }
-        pre { background: #f6f8fa; padding: 1rem; border-radius: 6px; overflow-x: auto; }
-        .header { background: linear-gradient(135deg, #2ea44f 0%, #1a7f37 100%); color: white; padding: 2rem; 
-                  text-align: center; margin-bottom: 2rem; border-radius: 8px; }
-        .nav { margin-bottom: 2rem; }
-        .nav a { color: #0969da; text-decoration: none; margin-right: 1rem; }
-        .nav a:hover { text-decoration: underline; }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h1>🚀 VANTUN Documentation</h1>
-        <p>$(echo $filename | tr '-' ' ' | sed 's/.*/\L&/; s/[a-z]*/\u&/g')</p>
-    </div>
-    
-    <div class="nav">
-        <a href="index.html">🏠 Home</a>
-        <a href="README.md">📖 Documentation</a>
-        <a href="https://github.com/tungoldshou/vantun">💻 GitHub</a>
-        <a href="https://t.me/vantun01">💬 Telegram</a>
-    </div>
-    
-    <div class="content">
-HTML_EOF
-              
-              # Convert markdown to HTML (simple conversion)
-              if command -v pandoc >/dev/null 2>&1; then
-                pandoc "$md_file" -t html >> "docs/${filename}.html"
-              else
-                # Fallback: simple markdown to HTML conversion
-                sed 's/^# /# /; s/^## /## /; s/^### /### /; 
-                     s/`\([^`]*\)`/<code>\1<\/code>/g; 
-                     s/\[\([^]]*\)\]\(([^)]*)\)/<a href="\2">\1<\/a>/g;' "$md_file" >> "docs/${filename}.html"
-              fi
-              
-              echo "    </div>" >> "docs/${filename}.html"
-              echo "</body>" >> "docs/${filename}.html"
-              echo "</html>" >> "docs/${filename}.html"
-            fi
-          done
-          
-          # Create a comprehensive index page
-          echo "📝 Creating comprehensive documentation index..."
-          cat > docs/README.md << 'EOF'
 # VANTUN Documentation
 
 Welcome to the VANTUN documentation! This site contains comprehensive guides and technical documentation for the next-generation secure tunnel protocol.
@@ -117,6 +19,20 @@ Welcome to the VANTUN documentation! This site contains comprehensive guides and
 - **Benchmark Script**: `./scripts/benchmark.sh`
 - **Interactive Charts**: Generated performance visualizations
 - **Protocol Comparison**: Detailed analysis vs Hysteria2, V2Ray, WireGuard
+
+## 🎯 Key Features
+
+<div align="center">
+
+| Feature | VANTUN | Hysteria2 | V2Ray | WireGuard |
+|---------|--------|-----------|-------|-----------|
+| **FEC Support** | ✅ Adaptive | ❌ None | ❌ None | ❌ None |
+| **Multipath** | ✅ Intelligent | ❌ Single | ❌ Single | ❌ Single |
+| **Obfuscation** | ✅ HTTP/3 | ✅ Brutal | ✅ Various | ❌ None |
+| **Performance (15% loss)** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐ |
+| **Mobile Optimization** | ✅ Excellent | ✅ Good | ⚠️ Fair | ❌ Poor |
+
+</div>
 
 ## 📈 Performance Highlights
 
@@ -234,20 +150,3 @@ This will generate:
 ---
 
 *This documentation is automatically deployed via GitHub Actions. For the latest updates, please check the [GitHub repository](https://github.com/tungoldshou/vantun).*
-EOF
-          
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: 'docs'
-
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.pages_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
